@@ -5,6 +5,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 
 
+#time.sleep(5)
 window = Tk()
 canvas = Canvas(window, height=700, width=700)
 canvas.pack()
@@ -79,30 +80,27 @@ def graph_calculation(graph: dict):
         for car in traffic:
             for car_node in range(len(car.way) - 1):
                 if node in car.way[car_node] and car.way[car_node + 1][0] in graph[node].keys() and car.way[car_node + 1][1] > 0:
-                    for i in time_lines:
-                        if i[1] == node and i[2] == car.way[car_node + 1][0]:
-                            i[-2].append(car.way[car_node + 1][2])
                     if car.kind == 'L':
                         graph[node][car.way[car_node + 1][0]][1] += 1
                         break
                     else:
                         graph[node][car.way[car_node + 1][0]][2] += 1
                         break
-    for i in time_lines:
-        canvas.delete(i[0])
-        try:
-            val = round(sum(i[3]) / len(i[3]), 1)
-        except ZeroDivisionError:
-            val = 0
-        new_time_lines.append([canvas.create_text(*i[-1],
-                             text=str(val), fill='black', font=('Helvetica 22')),
-                             i[1], i[2], [], i[-1]])
     for node in graph.keys():
         if graph[node]:
             for next_node in graph[node].keys():
                 graph[node][next_node][0] = read_chs(graph[node][next_node][0])[0] \
                     + graph[node][next_node][1] * read_chs(graph[node][next_node][0])[1] \
                     + graph[node][next_node][2] * read_chs(graph[node][next_node][0])[2]
+                for i in time_lines:
+                    if i[1] == node and i[2] == next_node:
+                        i[-2] = graph[node][next_node][0]
+    for i in time_lines:
+        canvas.delete(i[0])
+        val = i[3]
+        new_time_lines.append([canvas.create_text(*i[-1],
+                             text=str(int(val)), fill='black', font=('Helvetica 22')),
+                             i[1], i[2], [], i[-1]])
     return graph, new_time_lines
 
 
